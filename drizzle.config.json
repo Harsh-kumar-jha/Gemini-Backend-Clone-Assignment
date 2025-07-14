@@ -1,0 +1,8 @@
+{
+  "schema": "./src/models",
+  "out": "./drizzle",
+  "dialect": "postgresql",
+  "dbCredentials": {
+    "url": "postgres://postgres:postgres@localhost:5432/gemini_db"
+  }
+}
