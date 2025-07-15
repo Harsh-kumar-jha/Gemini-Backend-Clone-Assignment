@@ -24,9 +24,21 @@ services:
     networks:
       - app-network
 
+  rabbitmq:
+    image: rabbitmq:3-management
+    restart: always
+    ports:
+      - '5672:5672'   
+      - '15672:15672' 
+    volumes:
+      - rabbitmqdata:/var/lib/rabbitmq
+    networks:
+      - app-network
+
 volumes:
   pgdata:
   redisdata:
+  rabbitmqdata:
 
 networks:
   app-network:

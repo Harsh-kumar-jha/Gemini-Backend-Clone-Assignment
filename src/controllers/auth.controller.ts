@@ -1,9 +1,6 @@
 import { sendOtp, verifyOtp } from '../services/otp.service.js';
 import { signJwt } from '../utils/jwt.util.js';
-import { users } from '../models/User.js';
-import { eq } from 'drizzle-orm';
-import { dbPromise } from '../configs/db.js';
-import bcrypt from 'bcryptjs';
+import { AuthService } from '../services/auth.service.js';
 import { Request, Response } from 'express';
 
 export async function signup(req: Request, res: Response) {
@@ -11,13 +8,11 @@ export async function signup(req: Request, res: Response) {
   if (!mobile) {
     return res.status(400).json({ success: false, message: 'Mobile number is required' });
   }
-  const db = await dbPromise;
-  const existing = await db.select().from(users).where(eq(users.mobile, mobile));
-  if (existing.length > 0) {
+  const existing = await AuthService.findUserByMobile(mobile);
+  if (existing) {
     return res.status(409).json({ success: false, message: 'User already exists' });
   }
-  let hashedPassword = password ? await bcrypt.hash(password, 10) : null;
-  await db.insert(users).values({ mobile, name, password: hashedPassword });
+  await AuthService.createUser({ mobile, name, password });
   return res.status(201).json({ success: true, message: 'User registered successfully' });
 }
 
@@ -39,11 +34,10 @@ export async function verifyOtpController(req: Request, res: Response) {
   if (!valid) {
     return res.status(401).json({ success: false, message: 'Invalid OTP' });
   }
-  const db = await dbPromise;
   // Find or create user
-  let user = (await db.select().from(users).where(eq(users.mobile, mobile)))[0];
+  let user = await AuthService.findUserByMobile(mobile);
   if (!user) {
-    user = (await db.insert(users).values({ mobile }).returning())[0];
+    user = await AuthService.createUser({ mobile });
   }
   const token = signJwt({ id: user.id, mobile: user.mobile, tier: user.tier });
   return res.status(200).json({ success: true, token, user: { id: user.id, mobile: user.mobile, tier: user.tier } });
@@ -66,8 +60,6 @@ export async function changePasswordController(req: Request, res: Response) {
   if (!userId || !password) {
     return res.status(400).json({ success: false, message: 'User and password required' });
   }
-  const db = await dbPromise;
-  const hashedPassword = await bcrypt.hash(password, 10);
-  await db.update(users).set({ password: hashedPassword }).where(eq(users.id, userId));
+  await AuthService.changePassword(userId, password);
   return res.status(200).json({ success: true, message: 'Password changed successfully' });
 }
