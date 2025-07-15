@@ -45,6 +45,12 @@ A Node.js backend using Express, TypeScript, Drizzle ORM, PostgreSQL, Redis, and
    pnpm dev
    ```
 
+7. **Start the Gemini message worker (in a separate terminal):**
+   ```sh
+   pnpm tsx src/workers/geminiMessage.worker.ts
+   ```
+   This worker processes chat messages asynchronously via RabbitMQ and the Gemini API. It must be running for chat responses to work.
+
 ## Environment Variables
 ```
 PORT=3000
@@ -86,9 +92,82 @@ See [api-docs/auth-docs.md](api-docs/auth-docs.md) for detailed authentication A
 - `pnpm dev` — Start dev server
 - `pnpm build` — Build TypeScript
 - `pnpm start` — Run built app
+- `pnpm tsx src/workers/geminiMessage.worker.ts` — Run Gemini message worker (async chat)
 - `docker-compose up -d` — Start DB & Redis
 - `pnpm drizzle-kit generate` — Generate migrations
 - `pnpm drizzle-kit push` — Apply migrations
+
+---
+
+## Production: Running with PM2
+
+For production, use [PM2](https://pm2.keymetrics.io/) to run both the main app and the Gemini worker simultaneously and reliably.
+
+### 1. Install PM2 globally (if not already):
+```sh
+pnpm add -g pm2
+```
+
+### 2. Build your app:
+```sh
+pnpm build
+```
+
+### 3. Start both processes with PM2:
+```sh
+pm2 start dist/app.js --name app
+pm2 start src/workers/geminiMessage.worker.ts --interpreter pnpm --name gemini-worker
+```
+- If you use TypeScript directly in production, use `--interpreter pnpm` with `tsx` as above.
+- If you run compiled JS, use the built JS files (e.g., `dist/workers/geminiMessage.worker.js`).
+
+### 4. Save the process list and enable startup on boot:
+```sh
+pm2 save
+pm2 startup
+```
+
+### 5. Monitor logs:
+```sh
+pm2 logs
+```
+
+This ensures both your main app and the Gemini worker run together and restart automatically if they crash or the server reboots.
+
+---
+
+## Managing PM2 Processes
+
+Here are some useful commands for managing your PM2 processes in production:
+
+| Action                | Command                        |
+|-----------------------|--------------------------------|
+| Stop one process      | `pm2 stop <name or id>`        |
+| Stop all processes    | `pm2 stop all`                 |
+| Delete one process    | `pm2 delete <name or id>`      |
+| Delete all processes  | `pm2 delete all`               |
+| List processes        | `pm2 list`                     |
+
+**Examples:**
+- Stop just the Gemini worker:
+  ```sh
+  pm2 stop gemini-worker
+  ```
+- Stop all PM2 processes:
+  ```sh
+  pm2 stop all
+  ```
+- Delete (remove) the Gemini worker from PM2:
+  ```sh
+  pm2 delete gemini-worker
+  ```
+- List all running PM2 processes:
+  ```sh
+  pm2 list
+  ```
+
+- `stop` will stop the process but keep it in the PM2 list (so you can restart it later).
+- `delete` will stop and remove it from the list.
 
 ---
 

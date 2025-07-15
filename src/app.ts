@@ -5,7 +5,8 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import { connectRedis } from './utils/redis.util.js';
-import { authRoutes, userRoutes, geminiRoutes } from './routes/index.js';
+import { authRoutes, userRoutes, geminiRoutes, chatroomRoutes } from './routes/index.js';
+import { env } from './configs/env.js';
 
 // Logger setup
 import logger from './utils/logger.util.js';
@@ -28,13 +29,40 @@ connectRedis().catch((err) => logger.error('Redis connection error', err));
 app.use('/auth', authRoutes);
 app.use('/user', rateLimitMiddleware, userRoutes);
 app.use('/gemini', geminiRoutes);
+app.use('/chatroom', chatroomRoutes);
 
 // Error handling middleware
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 3000;
+const PORT = env.PORT;
 app.listen(PORT, () => {
   logger.info(`Server running on port ${PORT}`);
 });
 
+// After all services are initialized and app is listening
+logger.banner({
+  'Environment (.env)': true,
+  'Database': true, 
+  'Redis': true,
+  'RabbitMQ': true,
+  'Port': String(PORT),
+});
+
 export default app;
+
+// Graceful shutdown and error handling for production
+process.on('SIGINT', () => {
+  logger.info('Received SIGINT. Shutting down gracefully...');
+  process.exit(0);
+});
+process.on('SIGTERM', () => {
+  logger.info('Received SIGTERM. Shutting down gracefully...');
+  process.exit(0);
+});
+process.on('unhandledRejection', (reason, promise) => {
+  logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+process.on('uncaughtException', (err) => {
+  logger.error('Uncaught Exception thrown:', err);
+  process.exit(1);
+});

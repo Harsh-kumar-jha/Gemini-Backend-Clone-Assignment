@@ -10,7 +10,7 @@ export async function sendOtp(mobile: string, type: string) {
   const otp = generateOtp();
   const key = `otp:${type}:${mobile}`;
   await redisClient.setEx(key, OTP_TTL_SECONDS, otp);
-  return otp; // Mocked: return OTP in response
+  return otp; 
 }
 
 export async function verifyOtp(mobile: string, type: string, otp: string) {

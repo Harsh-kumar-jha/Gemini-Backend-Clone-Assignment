@@ -1,9 +1,8 @@
-import '../loadEnv.js';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Client } from 'pg';
+import { env } from './env.js';
 
-console.log('DATABASE_URL:', process.env.DATABASE_URL);
-const connectionString = process.env.DATABASE_URL || '';
+const connectionString = env.DATABASE_URL;
 const client = new Client({ connectionString });
 let isConnected = false;
 
