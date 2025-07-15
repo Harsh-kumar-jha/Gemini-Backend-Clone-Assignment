@@ -65,6 +65,7 @@ GEMINI_API_KEY=your-google-gemini-api-key
 
    - See [api-docs/auth-docs.md](api-docs/auth-docs.md) for detailed authentication API usage.
    - See [api-docs/chat-service-docs.md](api-docs/chat-service.docs.md) for detailed Chat room Service API usage.
+   - See [api-docs/subscription-payments.docs.md](api-docs/subscription-payments.docs.md) for Subscription & Payments API usage.
 
 ## Project Structure
 

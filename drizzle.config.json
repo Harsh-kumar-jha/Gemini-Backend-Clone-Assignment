@@ -1,5 +1,5 @@
 {
-  "schema": "./src/models",
+  "schema": "./dist/models",
   "out": "./drizzle",
   "dialect": "postgresql",
   "dbCredentials": {
