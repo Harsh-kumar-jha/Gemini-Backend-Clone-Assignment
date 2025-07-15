@@ -62,7 +62,9 @@ GEMINI_API_KEY=your-google-gemini-api-key
 ```
 
 ## API Documentation
-See [api-docs/auth-docs.md](api-docs/auth-docs.md) for detailed authentication API usage.
+
+   - See [api-docs/auth-docs.md](api-docs/auth-docs.md) for detailed authentication API usage.
+   - See [api-docs/chat-service-docs.md](api-docs/chat-service-docs.md) for detailed Chat room Service API usage.
 
 ## Project Structure
 
@@ -93,7 +95,7 @@ See [api-docs/auth-docs.md](api-docs/auth-docs.md) for detailed authentication A
 - `pnpm build` — Build TypeScript
 - `pnpm start` — Run built app
 - `pnpm tsx src/workers/geminiMessage.worker.ts` — Run Gemini message worker (async chat)
-- `docker-compose up -d` — Start DB & Redis
+- `docker-compose up -d` — Start DB, Redis, RabbitMQ
 - `pnpm drizzle-kit generate` — Generate migrations
 - `pnpm drizzle-kit push` — Apply migrations
 
