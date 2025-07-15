@@ -52,6 +52,7 @@ DATABASE_URL=postgres://postgres:postgres@localhost:5432/gemini_db
 REDIS_URL=redis://localhost:6379
 JWT_SECRET=your-super-secret-jwt-key
 JWT_EXPIRES_IN=24h
+GEMINI_API_KEY=your-google-gemini-api-key
 ```
 
 ## API Documentation

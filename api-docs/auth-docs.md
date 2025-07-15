@@ -109,3 +109,29 @@ All endpoints are prefixed with `/auth`.
 - OTPs are **mocked** and returned in the API response (not sent via SMS).
 - Use the JWT token from `/auth/verify-otp` for protected endpoints.
 - For testing, use Postman or curl as shown in the README. 
+
+---
+
+# Gemini API Documentation
+
+All endpoints are prefixed with `/gemini`.
+
+## 1. Generate Text
+- **POST** `/gemini/generate`
+- **Description:** Generate text using Google Gemini (free model).
+- **Request Body:**
+  ```json
+  {
+    "prompt": "Explain how AI works in a few words"
+  }
+  ```
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "text": "AI works by..."
+  }
+  ```
+- **Notes:**
+  - Requires `GEMINI_API_KEY` to be set in your `.env` file.
+  - Use this endpoint to generate text for any prompt using the Gemini free model. 

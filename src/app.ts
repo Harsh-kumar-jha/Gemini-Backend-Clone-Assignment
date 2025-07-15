@@ -5,7 +5,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import { connectRedis } from './utils/redis.util.js';
-import { authRoutes, userRoutes } from './routes/index.js';
+import { authRoutes, userRoutes, geminiRoutes } from './routes/index.js';
 
 // Logger setup
 import logger from './utils/logger.util.js';
@@ -27,6 +27,7 @@ connectRedis().catch((err) => logger.error('Redis connection error', err));
 // Routes
 app.use('/auth', authRoutes);
 app.use('/user', rateLimitMiddleware, userRoutes);
+app.use('/gemini', geminiRoutes);
 
 // Error handling middleware
 app.use(errorHandler);
