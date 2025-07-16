@@ -44,20 +44,27 @@ export async function subscribePro(req: Request, res: Response) {
         .json({ success: false, message: "User not found" });
     }
 
-    // Use email from database or generate one from mobile
-    const userEmail = user.email || `${user.mobile}@temp.com`;
+    // Use email from database, require it for Stripe
+    if (!user.email) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message:
+            "Email required for subscription. Please update your profile.",
+        });
+    }
+
     const sessionUrl = await StripeService.createProCheckoutSession(
       userId,
-      userEmail
+      user.email
     );
     return res.status(200).json({ success: true, url: sessionUrl });
   } catch (err: any) {
-    return res
-      .status(500)
-      .json({
-        success: false,
-        message: err.message || "Failed to create Stripe session",
-      });
+    return res.status(500).json({
+      success: false,
+      message: err.message || "Failed to create Stripe session",
+    });
   }
 }
 
@@ -81,11 +88,9 @@ export async function getSubscriptionStatus(req: Request, res: Response) {
     const status = await StripeService.getUserSubscriptionStatus(userId);
     return res.status(200).json({ success: true, ...status });
   } catch (err: any) {
-    return res
-      .status(500)
-      .json({
-        success: false,
-        message: err.message || "Failed to get subscription status",
-      });
+    return res.status(500).json({
+      success: false,
+      message: err.message || "Failed to get subscription status",
+    });
   }
 }

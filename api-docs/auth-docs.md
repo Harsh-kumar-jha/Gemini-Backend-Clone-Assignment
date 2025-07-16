@@ -3,12 +3,14 @@
 All endpoints are prefixed with `/auth`.
 
 ## 1. Signup
+
 - **POST** `/auth/signup`
-- **Description:** Register a new user with mobile number and optional info.
+- **Description:** Register a new user with mobile number, email and optional info.
 - **Request Body:**
   ```json
   {
     "mobile": "123456789",
+    "email": "user@example.com",
     "name": "Test User",
     "password": "testpass"
   }
@@ -21,6 +23,7 @@ All endpoints are prefixed with `/auth`.
 ---
 
 ## 2. Send OTP
+
 - **POST** `/auth/send-otp`
 - **Description:** Sends a mocked OTP to the user's mobile (returned in response).
 - **Request Body:**
@@ -35,6 +38,7 @@ All endpoints are prefixed with `/auth`.
 ---
 
 ## 3. Verify OTP
+
 - **POST** `/auth/verify-otp`
 - **Description:** Verifies the OTP and returns a JWT token for the session.
 - **Request Body:**
@@ -53,6 +57,7 @@ All endpoints are prefixed with `/auth`.
 ---
 
 ## 4. Forgot Password
+
 - **POST** `/auth/forgot-password`
 - **Description:** Sends OTP for password reset (mocked, returned in response).
 - **Request Body:**
@@ -61,12 +66,17 @@ All endpoints are prefixed with `/auth`.
   ```
 - **Response:**
   ```json
-  { "success": true, "otp": "123456", "message": "OTP for password reset sent (mocked)" }
+  {
+    "success": true,
+    "otp": "123456",
+    "message": "OTP for password reset sent (mocked)"
+  }
   ```
 
 ---
 
 ## 5. Change Password
+
 - **POST** `/auth/change-password`
 - **Auth Required:** Yes (Bearer JWT)
 - **Description:** Allows the user to change password while logged in.
@@ -84,6 +94,7 @@ All endpoints are prefixed with `/auth`.
 ---
 
 ## 6. Get Current User
+
 - **GET** `/user/me`
 - **Auth Required:** Yes (Bearer JWT)
 - **Description:** Returns details about the currently authenticated user.
@@ -105,10 +116,11 @@ All endpoints are prefixed with `/auth`.
 ---
 
 ## Notes
+
 - All endpoints return JSON with a `success` boolean and a `message`.
 - OTPs are **mocked** and returned in the API response (not sent via SMS).
 - Use the JWT token from `/auth/verify-otp` for protected endpoints.
-- For testing, use Postman or curl as shown in the README. 
+- For testing, use Postman or curl as shown in the README.
 
 ---
 
@@ -117,6 +129,7 @@ All endpoints are prefixed with `/auth`.
 All endpoints are prefixed with `/gemini`.
 
 ## 1. Generate Text
+
 - **POST** `/gemini/generate`
 - **Description:** Generate text using Google Gemini (free model).
 - **Request Body:**
@@ -134,4 +147,4 @@ All endpoints are prefixed with `/gemini`.
   ```
 - **Notes:**
   - Requires `GEMINI_API_KEY` to be set in your `.env` file.
-  - Use this endpoint to generate text for any prompt using the Gemini free model. 
+  - Use this endpoint to generate text for any prompt using the Gemini free model.
