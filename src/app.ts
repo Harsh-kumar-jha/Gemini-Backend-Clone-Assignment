@@ -1,35 +1,41 @@
-import './loadEnv.js';
+import "./loadEnv.js";
 
-import express from 'express';
-import cors from 'cors';
-import helmet from 'helmet';
-import morgan from 'morgan';
-import { connectRedis } from './utils/redis.util.js';
-import { authRoutes, userRoutes, geminiRoutes, chatroomRoutes } from './routes/index.js';
-import { env } from './configs/env.js';
+import express from "express";
+import cors from "cors";
+import helmet from "helmet";
+import morgan from "morgan";
+import { connectRedis } from "./utils/redis.util.js";
+import {
+  authRoutes,
+  userRoutes,
+  geminiRoutes,
+  chatroomRoutes,
+} from "./routes/index.js";
+import { env } from "./configs/env.js";
 
 // Logger setup
-import logger from './utils/logger.util.js';
-import { errorHandler } from './middlewares/error.middleware.js';
-import { rateLimitMiddleware } from './middlewares/rateLimit.middleware.js';
-
-
+import logger from "./utils/logger.util.js";
+import { errorHandler } from "./middlewares/error.middleware.js";
+import { rateLimitMiddleware } from "./middlewares/rateLimit.middleware.js";
 
 const app = express();
+
+// Special handling for Stripe webhook - must be before express.json()
+app.use("/user/webhook/stripe", express.raw({ type: "application/json" }));
 
 app.use(express.json());
 app.use(cors());
 app.use(helmet());
-app.use(morgan('combined', { stream: logger.stream }));
+app.use(morgan("combined", { stream: logger.stream }));
 
 // Connect to Redis
-connectRedis().catch((err) => logger.error('Redis connection error', err));
+connectRedis().catch((err) => logger.error("Redis connection error", err));
 
 // Routes
-app.use('/auth', authRoutes);
-app.use('/user', rateLimitMiddleware, userRoutes);
-app.use('/gemini', geminiRoutes);
-app.use('/chatroom', chatroomRoutes);
+app.use("/auth", authRoutes);
+app.use("/user", rateLimitMiddleware, userRoutes);
+app.use("/gemini", geminiRoutes);
+app.use("/chatroom", chatroomRoutes);
 
 // Error handling middleware
 app.use(errorHandler);
@@ -41,28 +47,28 @@ app.listen(PORT, () => {
 
 // After all services are initialized and app is listening
 logger.banner({
-  'Environment (.env)': true,
-  'Database': true, 
-  'Redis': true,
-  'RabbitMQ': true,
-  'Port': String(PORT),
+  "Environment (.env)": true,
+  Database: true,
+  Redis: true,
+  RabbitMQ: true,
+  Port: String(PORT),
 });
 
 export default app;
 
 // Graceful shutdown and error handling for production
-process.on('SIGINT', () => {
-  logger.info('Received SIGINT. Shutting down gracefully...');
+process.on("SIGINT", () => {
+  logger.info("Received SIGINT. Shutting down gracefully...");
   process.exit(0);
 });
-process.on('SIGTERM', () => {
-  logger.info('Received SIGTERM. Shutting down gracefully...');
+process.on("SIGTERM", () => {
+  logger.info("Received SIGTERM. Shutting down gracefully...");
   process.exit(0);
 });
-process.on('unhandledRejection', (reason, promise) => {
-  logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
+process.on("unhandledRejection", (reason, promise) => {
+  logger.error("Unhandled Rejection at:", promise, "reason:", reason);
 });
-process.on('uncaughtException', (err) => {
-  logger.error('Uncaught Exception thrown:', err);
+process.on("uncaughtException", (err) => {
+  logger.error("Uncaught Exception thrown:", err);
   process.exit(1);
 });
