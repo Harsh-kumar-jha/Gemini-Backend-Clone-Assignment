@@ -39,4 +39,20 @@ export async function getMessagesInChatroom(req: Request, res: Response) {
     logger.error('[MessageController] Error fetching messages:', err?.message || err);
     return res.status(500).json({ success: false, message: 'Failed to fetch messages', error: err?.message || err });
   }
+}
+
+// Debug endpoint to check system status
+export async function debugStatus(req: Request, res: Response) {
+  const status = {
+    timestamp: new Date().toISOString(),
+    environment: {
+      RABBITMQ_URL: !!process.env.RABBITMQ_URL,
+      GEMINI_API_KEY: !!process.env.GEMINI_API_KEY,
+      DATABASE_URL: !!process.env.DATABASE_URL,
+    },
+    message: 'System status check'
+  };
+  
+  logger.info('[MessageController] Debug status requested:', status);
+  return res.status(200).json({ success: true, status });
 } 

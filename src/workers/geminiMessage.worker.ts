@@ -26,7 +26,7 @@ async function handleMessage(channel: any, msg: any) {
   }
 }
 
-async function startWorker() {
+export async function startWorker() {
   logger.info('[GeminiWorker] Starting Gemini message worker...');
   const channel = await connectRabbitMQ();
   await channel.assertQueue(QUEUE_NAME, { durable: true });
