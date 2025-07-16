@@ -17,6 +17,8 @@ import { env } from "./configs/env.js";
 import logger from "./utils/logger.util.js";
 import { errorHandler } from "./middlewares/error.middleware.js";
 import { rateLimitMiddleware } from "./middlewares/rateLimit.middleware.js";
+import { authMiddleware } from "./middlewares/auth.middleware.js";
+import { subscribePro, handleStripeWebhook, getSubscriptionStatus } from "./controllers/user.controller.js";
 
 const app = express();
 
@@ -36,6 +38,11 @@ app.use("/auth", authRoutes);
 app.use("/user", rateLimitMiddleware, userRoutes);
 app.use("/gemini", geminiRoutes);
 app.use("/chatroom", chatroomRoutes);
+
+// Subscription routes (as per requirements specification)
+app.post("/subscribe/pro", authMiddleware, subscribePro);
+app.post("/webhook/stripe", handleStripeWebhook);
+app.get("/subscription/status", authMiddleware, getSubscriptionStatus);
 
 // Error handling middleware
 app.use(errorHandler);
