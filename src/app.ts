@@ -50,7 +50,30 @@ app.use(errorHandler);
 const PORT = env.PORT;
 app.listen(PORT, () => {
   logger.info(`Server running on port ${PORT}`);
+  
+  // Start Gemini worker inline for Railway deployment
+  logger.info('Starting Gemini worker inline...');
+  startGeminiWorker().catch(err => {
+    logger.error('Failed to start Gemini worker:', err);
+  });
 });
+
+// Import and start the worker
+async function startGeminiWorker() {
+  try {
+    const { startWorker } = await import('./workers/geminiMessage.worker.js');
+    await startWorker();
+    logger.info('Gemini worker started successfully');
+  } catch (err) {
+    logger.error('Error starting Gemini worker:', err);
+    // Fallback: try importing the worker directly
+    try {
+      await import('./workers/geminiMessage.worker.js');
+    } catch (importErr) {
+      logger.error('Failed to import worker:', importErr);
+    }
+  }
+}
 
 // After all services are initialized and app is listening
 logger.banner({
