@@ -1,5 +1,8 @@
 {
   "schema": "./dist/models",
   "out": "./drizzle",
-  "dialect": "postgresql"
+  "dialect": "postgresql",
+   "dbCredentials": {
+    "connectionString": "${DATABASE_URL}"
+  }
 }
